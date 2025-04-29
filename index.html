@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AquaVision Enhance & Detect</title>
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(to right, #6dd5fa, #ffffff);
+        font-family: "Poppins", sans-serif;
+        text-align: center;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .main-heading {
+        margin-top: 50px;
+        font-size: 32px;
+        font-weight: 700;
+        color: #0d8ecf;
+      }
+
+      .sub-heading {
+        margin-top: 10px;
+        margin-bottom: 30px;
+        font-size: 18px;
+        font-weight: 400;
+        color: #555;
+      }
+
+      .container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 30px;
+        width: 90%;
+        max-width: 1200px;
+        margin-top: 30px;
+      }
+
+      .upload-section,
+      .output-section {
+        padding: 40px;
+        width: 45%;
+        border-radius: 15px;
+        background: #ffffff;
+        box-shadow: 0 8px 16px rgba(30, 174, 219, 0.3);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      h2 {
+        margin-bottom: 20px;
+        color: #1eaedb;
+        font-size: 24px;
+      }
+
+      input[type="file"] {
+        margin: 20px 0;
+        font-size: 16px;
+        padding: 10px;
+      }
+
+      button {
+        background-color: #1eaedb;
+        border: none;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #0d8ecf;
+      }
+
+      .drag-drop {
+        border: 2px dashed #1eaedb;
+        padding: 20px;
+        margin: 20px;
+        width: 100%;
+        height: 150px;
+        border-radius: 8px;
+        text-align: center;
+        color: #555;
+      }
+
+      .image-preview {
+        margin-top: 20px;
+        max-width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .results-wrapper {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .result-box {
+        flex: 1;
+      }
+
+      .result-box h3 {
+        color: #1eaedb;
+        margin-bottom: 10px;
+      }
+
+      .result-box img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <div class="main-heading">AquaVision Enhance & Detect</div>
+    <div class="sub-heading">Underwater image enhancement using advanced CV-GAN techniques</div>
+
+    <div class="container">
+      <!-- Upload Section -->
+      <div class="upload-section">
+        <h2>Upload Your Underwater Image</h2>
+        <div
+          id="drag-drop-zone"
+          class="drag-drop"
+          ondrop="handleDrop(event)"
+          ondragover="handleDragOver(event)"
+        >
+          <p>Drag and drop your image here, or click to select.</p>
+          <input type="file" id="imageInput" accept="image/*" onchange="handleFileSelect(event)" />
+        </div>
+        <div class="image-preview" id="uploadedImage"></div>
+        <button onclick="uploadImage()">Upload & Enhance</button>
+      </div>
+
+      <!-- Output Section -->
+      <div class="output-section">
+        <h2>Results</h2>
+        <div class="results-wrapper">
+          <div class="result-box">
+            <h3>Enhanced</h3>
+            <div id="enhancedImage"></div>
+          </div>
+          <div class="result-box">
+            <h3>Detection</h3>
+            <div id="detectedImage"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DO NOT REMOVE THIS -->
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <script type="module" src="/src/main.tsx"></script>
+
+    <script>
+      function handleDragOver(event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+          displayImagePreview(file);
+        }
+      }
+
+      function handleDrop(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const file = event.dataTransfer.files[0];
+        if (file) {
+          displayImagePreview(file);
+        }
+      }
+
+      function displayImagePreview(file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const imgElement = document.createElement("img");
+          imgElement.src = e.target.result;
+          imgElement.classList.add("image-preview");
+          document.getElementById("uploadedImage").innerHTML = "";
+          document.getElementById("uploadedImage").appendChild(imgElement);
+        };
+        reader.readAsDataURL(file);
+      }
+
+      async function uploadImage() {
+        const fileInput = document.getElementById("imageInput");
+        const file = fileInput.files[0];
+        if (!file) {
+          alert("Please select an image.");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("image", file);
+
+        try {
+          const response = await fetch("http://127.0.0.1:5000/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+
+            const enhancedUrl = "data:image/jpeg;base64," + result.enhanced_image;
+            const detectedUrl = "data:image/jpeg;base64," + result.detected_image;
+
+            document.getElementById("enhancedImage").innerHTML = `<img src="${enhancedUrl}" alt="Enhanced Image" />`;
+            document.getElementById("detectedImage").innerHTML = `<img src="${detectedUrl}" alt="Detected Image" />`;
+          } else {
+            alert("Error uploading image.");
+          }
+        } catch (error) {
+          console.error("Upload failed:", error);
+          alert("Something went wrong. Try again!");
+        }
+      }
+    </script>
+  </body>
+</html>
