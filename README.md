@@ -74,24 +74,21 @@ Final model is deployed with the best-performing enhancement method for real-tim
 
 ---
 
-## 📂 Project Structure (Suggested)
+## 📂 Project Structure 
 project/ │ ├── datasets/ │ ├── EUVP/ │ └── FISH/ │ ├── preprocessing/ │ └── data_cleaning.py │ ├── enhancement/ │ ├── traditional_methods.py │ ├── funie_gan/ │ └── usr_gan/ │ ├── detection/ │ └── yolo_detection.py │ ├── evaluation/ │ └── metrics.py │ ├── postprocessing/ │ └── clahe_saturation.py │ └── deployment/ └── deploy_model.py
 
 yaml
-Always show details
 
-Copy
 
 ---
 
 ## 📌 Conclusion
 This project demonstrates the integration of GAN-based image enhancement and real-time fish detection, improving object visibility in challenging underwater environments. The optimal enhancement method significantly boosts detection performance.
-"""
 
-readme_path = "/mnt/data/README.md"
-with open(readme_path, "w") as f:
-    f.write(readme_content)
+# Deployment :
 
-readme_path
+<img width="1201" alt="Screenshot 2025-04-29 at 4 03 11 PM" src="https://github.com/user-attachments/assets/b6232b20-5d14-403a-8c38-cb0abacc29c2" />
+
+
 
 
